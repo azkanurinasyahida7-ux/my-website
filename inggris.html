@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>English Anki Pro (Fixed Action Buttons)</title>
+    <style>
+        /* --- CORE DESIGN APPLICATIONS (Gaya Desktop Modern) --- */
+        :root {
+            --window-bg: #f8fafc;
+            --sidebar-bg: #0f172a;
+            --sidebar-text: #94a3b8;
+            --sidebar-active: #3b82f6; 
+            --content-bg: #ffffff;
+            --border-color: #e2e8f0;
+            --primary-color: #1d4ed8; 
+            --text-main: #1e293b;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--window-bg);
+            color: var(--text-main);
+            height: 100vh;
+            display: flex;
+            overflow: hidden;
+        }
+
+        /* --- SIDEBAR NAVIGASI KIRI (DUAL SYSTEM NAVIGATION) --- */
+        .sidebar {
+            width: 260px;
+            background-color: var(--sidebar-bg);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            flex-shrink: 0;
+        }
+
+        .sidebar-brand {
+            padding: 30px 24px;
+            font-size: 16px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            border-bottom: 1px solid #1e293b;
+            color: #f8fafc;
+            text-transform: uppercase;
+            text-align: center;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+            padding: 20px 0;
+            flex-grow: 1;
+        }
+
+        .sidebar-item {
+            padding: 14px 24px;
+            color: var(--sidebar-text);
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            transition: all 0.2s ease;
+        }
+
+        .sidebar-item:hover {
+            background-color: #1e293b;
+            color: #ffffff;
+        }
+
+        .sidebar-item.active {
+            background-color: #1e293b;
+            color: #ffffff;
+            border-left: 4px solid var(--sidebar-active);
+            font-weight: 600;
+        }
+
+        .sidebar-footer {
+            padding: 20px 24px;
+            font-size: 12px;
+            color: #475569;
+            border-top: 1px solid #1e293b;
+            text-align: center;
+        }
+
+        /* --- WORKSPACE KANAN --- */
+        .main-content {
+            flex-grow: 1;
+            background-color: var(--content-bg);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .content-header {
+            height: 70px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            padding: 0 40px;
+            background: #ffffff;
+        }
+
+        .content-header h2 { font-size: 20px; font-weight: 600; color: #0f172a; }
+        .content-body { padding: 40px; flex-grow: 1; overflow-y: auto; }
+
+        /* --- ATTRIBUTE TAB PAGES --- */
+        .screen { display: none; height: 100%; }
+        .screen.active { display: block; }
+
+        /* --- TAB SUB-MENU KUIS --- */
+        .quiz-tab-group {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        .quiz-tab {
+            background-color: #f1f5f9;
+            color: #475569;
+            border: 1px solid var(--border-color);
+            padding: 8px 18px;
+            font-size: 13px;
+            font-weight: 600;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .quiz-tab:hover { background-color: #e2e8f0; }
+        .quiz-tab.active {
+            background-color: var(--sidebar-bg);
+            color: #ffffff;
+            border-color: var(--sidebar-bg);
+        }
+        
+        #tab-mode-netral, #tab-speaking-netral { background-color: #f8fafc; border: 1px dashed #cbd5e1; color: #64748b; cursor: default; }
+        #tab-mode-netral.active, #tab-speaking-netral.active { background-color: #475569; color: #ffffff; border-style: solid; }
+
+        /* --- STYLING FORM INPUT --- */
+        .form-container-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            max-width: 450px;
+        }
+
+        .form-row {
+            display: flex;
+            flex-direction: column;
+            text-align: left;
+        }
+
+        textarea {
+            width: 100%;
+            height: 80px; 
+            padding: 12px 14px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 14px;
+            margin-top: 6px;
+            box-sizing: border-box;
+            background-color: #f8fafc;
+            transition: all 0.2s;
+            resize: none; 
+            font-family: inherit;
+        }
+        
+        textarea:focus {
+            outline: none;
+            border-color: var(--sidebar-active);
+            background-color: #ffffff;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        
+        label { font-size: 13px; font-weight: 600; color: #475569; }
+
+        /* --- STYLING TOMBOL --- */
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.15s ease;
+        }
+
+        button:hover { filter: brightness(1.1); transform: translateY(-1px); }
+        button:active { transform: translateY(0); }
+        
+        .btn-secondary { background-color: #64748b; }
+        .btn-hard { background-color: #ef4444; }
+        .btn-good { background-color: #f59e0b; }
+        .btn-easy { background-color: #10b981; }
+        .btn-danger { background-color: #dc2626; }
+        
+        /* --- UPGRADE: STYLING TOMBOL MINI TABEL BIAR MENYAMPING RAPI --- */
+        .btn-action { 
+            padding: 6px 12px; 
+            font-size: 12px; 
+            border-radius: 6px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            white-space: nowrap;
+        }
+        .btn-action:hover { transform: translateY(-1px); filter: brightness(1.05); }
+
+        .action-flex-container {
+            display: flex;
+            gap: 6px;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+        }
+
+        .icon-audio-quiz {
+            font-size: 56px; 
+            cursor: pointer;
+            display: inline-block;
+            margin: 20px 0;
+            user-select: none;
+            transition: transform 0.1s ease;
+        }
+        .icon-audio-quiz:hover { transform: scale(1.12); } 
+        .icon-audio-quiz:active { transform: scale(0.95); }
+        
+        .btn-audio-repeat {
+            background-color: #2563eb;
+            padding: 6px 12px;
+            font-size: 11px;
+            border-radius: 6px;
+            margin-left: 10px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            vertical-align: middle;
+        }
+
+        /* --- DASHBOARD SECTIONS --- */
+        .dashboard-grid { display: flex; gap: 20px; flex-wrap: wrap; }
+        .dashboard-box {
+            background: #f8fafc;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 30px;
+            flex: 1;
+            min-width: 280px;
+            max-width: 400px;
+        }
+
+        /* --- FLASHCARD STUDY WORKSPACE --- */
+        .flashcard-container { max-width: 600px; margin: 0 auto; text-align: center; }
+        
+        .desktop-card {
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 40px 40px;
+            min-height: 320px;
+            margin-bottom: 25px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 4px 20px rgba(15, 23, 42, 0.03);
+        }
+
+        .answer-list-container { width: 100%; max-width: 450px; text-align: left; margin: 0 auto; }
+        .answer-row { margin-bottom: 20px; }
+        .answer-row:last-child { margin-bottom: 0; }
+
+        .card-meta-review { font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: #94a3b8; margin-bottom: 5px; }
+        .prompt-text-large { font-size: 28px; font-weight: 700; color: #0f172a; margin: 5px 0; white-space: pre-wrap; }
+        .english-text-list { font-size: 36px; font-weight: 700; color: #2563eb; line-height: 1.3; display: inline-block; white-space: pre-wrap; }
+        .grammar-text-list { font-size: 18px; font-weight: 600; color: #64748b; font-style: italic; white-space: pre-wrap; }
+        .arti-text-list { font-size: 22px; font-weight: 600; color: #16a34a; white-space: pre-wrap; }
+        .desktop-divider { width: 100%; border-top: 1px dashed #e2e8f0; margin: 20px 0; }
+
+        /* --- TABLE COLLECTION VIEW --- */
+        .grid-container { border: 1px solid var(--border-color); border-radius: 10px; overflow: hidden; background: white; }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; text-align: left; table-layout: fixed; }
+        th { background-color: #f8fafc; color: #64748b; font-weight: 600; padding: 14px 20px; border-bottom: 1px solid var(--border-color); }
+        td { padding: 14px 20px; border-bottom: 1px solid var(--border-color); color: #334155; white-space: pre-wrap; word-wrap: break-word; }
+        tr:last-child td { border-bottom: none; }
+        tr:hover td { background-color: #f8fafc; }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <div>
+            <div class="sidebar-brand">🇺🇸 English Anki Pro</div>
+            <ul class="sidebar-menu">
+                <li id="nav-dashboard" class="sidebar-item active" onclick="clickNav('dashboard-screen')">🏠 Dashboard</li>
+                
+                <li style="padding: 10px 24px 2px 24px; font-size: 11px; font-weight: 700; color: #475569; letter-spacing: 0.5px; text-transform: uppercase;">A. Vocabulary</li>
+                <li id="nav-review" class="sidebar-item" onclick="clickNavReview()">📖 Vocabulary Session</li>
+                <li id="nav-add" class="sidebar-item" onclick="clickNavAdd()">➕ Add Word / Phrase</li>
+                <li id="nav-manage" class="sidebar-item" onclick="clickNavManage()">🗂️ Word Collection</li>
+                
+                <li style="padding: 18px 24px 2px 24px; font-size: 11px; font-weight: 700; color: #475569; letter-spacing: 0.5px; text-transform: uppercase;">B. Speaking Prompts</li>
+                <li id="nav-speaking-review" class="sidebar-item" onclick="clickNavSpeakingReview()">🗣️ Speaking Session</li>
+                <li id="nav-speaking-add" class="sidebar-item" onclick="clickNavSpeakingAdd()">➕ Add Prompt Card</li>
+                <li id="nav-speaking-manage" class="sidebar-item" onclick="clickNavSpeakingManage()">🗂️ Prompt Collection</li>
+            </ul>
+        </div>
+        <div class="sidebar-footer">
+            Mac Female Voice USA<br>Fixed Table Layout
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="content-header">
+            <h2 id="workspace-title">Dashboard</h2>
+        </div>
+        
+        <div class="content-body">
+            
+            <div id="dashboard-screen" class="screen active">
+                <div class="dashboard-grid">
+                    <div class="dashboard-box">
+                        <h3 style="margin-bottom: 12px; font-size: 16px; color:#475569; border-bottom: 2px solid #e2e8f0; padding-bottom: 6px;">A. VOCABULARY</h3>
+                        <p id="stat-total" style="font-size: 14px; margin-bottom: 8px;">Total Words: 0</p>
+                        <p id="stat-due" style="font-size: 14px; margin-bottom: 20px; font-weight: bold; color: var(--sidebar-active);">Due today: 0 words</p>
+                        <button onclick="clickNavReview()" style="background-color: var(--sidebar-active); width: 100%;">Review Vocabulary</button>
+                    </div>
+                    
+                    <div class="dashboard-box">
+                        <h3 style="margin-bottom: 12px; font-size: 16px; color:#475569; border-bottom: 2px solid #e2e8f0; padding-bottom: 6px;">B. SPEAKING PROMPTS</h3>
+                        <p id="stat-speaking-total" style="font-size: 14px; margin-bottom: 8px;">Total Prompts: 0</p>
+                        <p id="stat-speaking-due" style="font-size: 14px; margin-bottom: 20px; font-weight: bold; color: #059669;">Due today: 0 prompts</p>
+                        <button onclick="clickNavSpeakingReview()" style="background-color: #059669; width: 100%;">Review Speaking</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="add-screen" class="screen">
+                <input type="hidden" id="edit-card-id">
+                <div class="form-container-list">
+                    <div class="form-row"><label for="front-input">English Word/Sentence</label><textarea id="front-input" placeholder="e.g., I highly recommend this."></textarea></div>
+                    <div class="form-row"><label for="pinyin-input">Grammar / Word Class / Notes</label><textarea id="pinyin-input" placeholder="e.g., Verb / Phrase..."></textarea></div>
+                    <div class="form-row"><label for="back-input">Meaning (Bahasa Indonesia)</label><textarea id="back-input" placeholder="Contoh: Saya sangat merekomendasikan ini."></textarea></div>
+                    <div style="margin-top: 5px; display: flex; gap: 8px;">
+                        <button onclick="saveCard()" id="btn-save" style="background-color: var(--sidebar-active);">Save Word</button>
+                        <button onclick="cancelAddEdit()" class="btn-secondary">Cancel</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="review-screen" class="screen">
+                <div class="quiz-tab-group">
+                    <div id="tab-mode-netral" class="quiz-tab active">⚙️ Select Mode:</div>
+                    <div id="tab-mode-suara" class="quiz-tab" onclick="gantiModeKuis('suara')">🎧 Guess Audio</div>
+                    <div id="tab-mode-hanzi" class="quiz-tab" onclick="gantiModeKuis('hanzi')">📝 Guess English</div>
+                    <div id="tab-mode-indo" class="quiz-tab" onclick="gantiModeKuis('indo')">🇮🇩 Guess Indo</div>
+                </div>
+                <div class="flashcard-container">
+                    <div class="desktop-card"><div id="qa-area" style="width: 100%;"></div></div>
+                    <button id="btn-show" style="width: 220px; padding: 14px; display: none; background-color: var(--sidebar-active);" onclick="showAnswer()">Show Answer</button>
+                    <div id="rating-zone" style="display: none;">
+                        <p style="font-size: 13px; color: #64748b; margin-bottom: 15px;">How well did you remember this?</p>
+                        <button class="btn-hard" onclick="submitFeedback(1)">Hard (1d)</button>
+                        <button class="btn-good" onclick="submitFeedback(3)">Good (3d)</button>
+                        <button class="btn-easy" onclick="submitFeedback(7)">Easy (7d)</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="manage-screen" class="screen">
+                <div class="grid-container"><table>
+                    <thead><tr><th style="width: 25%;">English</th><th style="width: 25%;">Grammar / Notes</th><th style="width: 25%;">Meaning (Indo)</th><th style="width: 25%; text-align: center;">Action</th></tr></thead>
+                    <tbody id="cards-table-body"></tbody>
+                </table></div>
+            </div>
+
+            <div id="speaking-add-screen" class="screen">
+                <input type="hidden" id="edit-speaking-id">
+                <div class="form-container-list">
+                    <div class="form-row">
+                        <label for="speaking-front-input">Instruksi / Skenario Soal Latihan Speaking (Bahasa Indonesia)</label>
+                        <textarea id="speaking-front-input" style="height: 120px;" placeholder="Misal: Kamu berada di bandara Amerika dan harus bertanya ke petugas di mana lokasi pengambilan bagasi."></textarea>
+                    </div>
+                    <div style="margin-top: 5px; display: flex; gap: 8px;">
+                        <button onclick="saveSpeakingCard()" id="btn-speaking-save" style="background-color: #059669;">Save Prompt Card</button>
+                        <button onclick="cancelSpeakingAddEdit()" class="btn-secondary">Cancel</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="speaking-review-screen" class="screen">
+                <div class="quiz-tab-group">
+                    <div id="tab-speaking-netral" class="quiz-tab active">⚙️ Speaking Mode:</div>
+                    <div class="quiz-tab" style="background-color: #059669; color: white; border-color: #059669; cursor: default;">🗣️ Active Speech Production</div>
+                </div>
+                <div class="flashcard-container">
+                    <div class="desktop-card"><div id="speaking-qa-area" style="width: 100%;"></div></div>
+                    <button id="btn-speaking-show" style="width: 240px; padding: 14px; background-color: #059669; color: white;" onclick="showSpeakingAnswer()">Saya Sudah Selesai Berbicara ➔</button>
+                    <div id="speaking-rating-zone" style="display: none;">
+                        <p style="font-size: 13px; color: #64748b; margin-bottom: 15px;">Seberapa lancar kamu membuat dan mengucap kalimatnya tadi?</p>
+                        <button class="btn-hard" onclick="submitSpeakingFeedback(1)">Hard (1 hari)</button>
+                        <button class="btn-good" onclick="submitSpeakingFeedback(3)">Good (3 hari)</button>
+                        <button class="btn-easy" onclick="submitSpeakingFeedback(7)">Easy (7 hari)</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="speaking-manage-screen" class="screen">
+                <div class="grid-container"><table>
+                    <thead><tr><th style="width: 75%;">Daftar Skenario / Instruksi Latihan Speaking</th><th style="width: 25%; text-align: center;">Action</th></tr></thead>
+                    <tbody id="speaking-cards-table-body"></tbody>
+                </table></div>
+            </div>
+
+        </div>
+    </div>
+
+<script>
+    let cards = JSON.parse(localStorage.getItem('english_anki_cards')) || [];
+    let speakingCards = JSON.parse(localStorage.getItem('english_speaking_cards')) || [];
+
+    let currentCardIndex = -1;
+    let dueCards = [];
+    let currentSpeakingIndex = -1;
+    let dueSpeakingCards = [];
+    let modeKuisAktif = 'netral';
+
+    updateStats();
+
+    // --- ENGINE AUDIO PREMIUM PEREMPUAN MAC (en-US) ---
+    function putarAudioEnglish(teksEnglish) {
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.cancel(); 
+            const utterance = new SpeechSynthesisUtterance(teksEnglish);
+            utterance.lang = 'en-US'; 
+            utterance.rate = 0.90; 
+
+            const voices = window.speechSynthesis.getVoices();
+            let femaleVoice = voices.find(v => (v.lang === 'en-US' || v.lang === 'en_US') && (v.name.includes('Samantha') || v.name.includes('Ava') || v.name.includes('Allison')));
+            if (!femaleVoice) femaleVoice = voices.find(v => (v.lang === 'en-US' || v.lang === 'en_US') && (v.name.includes('Zira') || v.name.includes('Aria')));
+            if (!femaleVoice) femaleVoice = voices.find(v => (v.lang === 'en-US' || v.lang === 'en_US') && !v.name.includes('Google'));
+            if (!femaleVoice) femaleVoice = voices.find(v => v.lang.startsWith('en'));
+
+            if (femaleVoice) utterance.voice = femaleVoice;
+            window.speechSynthesis.speak(utterance);
+        }
+    }
+
+    if ('speechSynthesis' in window) {
+        window.speechSynthesis.getVoices();
+        if (window.speechSynthesis.onvoiceschanged !== undefined) {
+            window.speechSynthesis.onvoiceschanged = window.speechSynthesis.getVoices;
+        }
+    }
+
+    // --- MANAGER ROUTING HALAMAN ---
+    function clickNav(screenId, customTitle = "") {
+        if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById(screenId).classList.add('active');
+        document.querySelectorAll('.sidebar-item').forEach(item => item.classList.remove('active'));
+        
+        let title = customTitle;
+        if(screenId === 'dashboard-screen') { title = "Dashboard"; document.getElementById('nav-dashboard').classList.add('active'); }
+        if(screenId === 'add-screen' && !customTitle) { title = "Add Vocabulary Word"; document.getElementById('nav-add').classList.add('active'); }
+        if(screenId === 'review-screen') { title = "Vocabulary Review Session"; document.getElementById('nav-review').classList.add('active'); }
+        if(screenId === 'manage-screen') { title = "Vocabulary Bank Collection"; document.getElementById('nav-manage').classList.add('active'); }
+        
+        if(screenId === 'speaking-add-screen') { title = "Add Speaking Prompt Card"; document.getElementById('nav-speaking-add').classList.add('active'); }
+        if(screenId === 'speaking-review-screen') { title = "Speaking Prompts Active Session"; document.getElementById('nav-speaking-review').classList.add('active'); }
+        if(screenId === 'speaking-manage-screen') { title = "Speaking Prompts Collection"; document.getElementById('nav-speaking-manage').classList.add('active'); }
+
+        document.getElementById('workspace-title').innerText = title;
+        updateStats();
+
+        if(screenId === 'review-screen') {
+            modeKuisAktif = 'netral';
+            document.querySelectorAll('.quiz-tab').forEach(t => t.classList.remove('active'));
+            document.getElementById('tab-mode-netral').classList.add('active');
+            document.getElementById('qa-area').innerHTML = `
+                <div style="color: #94a3b8; font-size: 24px; font-weight: bold; margin-bottom: 12px;">🎴 Flashcard Ready</div>
+                <p style="font-size: 14px; color: #64748b; max-width: 320px; margin: 0 auto; line-height: 1.6;">
+                    Please select a quiz mode above to start testing yourself.
+                </p>
+            `;
+            document.getElementById('btn-show').style.display = 'none'; 
+            document.getElementById('rating-zone').style.display = 'none'; 
+        }
+    }
+
+    function updateStats() {
+        const today = new Date().toISOString().split('T')[0];
+        const dueA = cards.filter(c => c.dueDate <= today).length;
+        document.getElementById('stat-total').innerText = `Total Words: ${cards.length}`;
+        document.getElementById('stat-due').innerText = `Due today: ${dueA} words`;
+
+        const dueB = speakingCards.filter(c => c.dueDate <= today).length;
+        document.getElementById('stat-speaking-total').innerText = `Total Prompts: ${speakingCards.length}`;
+        document.getElementById('stat-speaking-due').innerText = `Due today: ${dueB} prompts`;
+    }
+
+    // ==========================================
+    // MODULE SYSTEM A: VOCABULARY
+    // ==========================================
+    function clickNavAdd() { clearForm(); clickNav('add-screen'); }
+    function clickNavManage() { clickNav('manage-screen'); renderTable(); }
+    function clickNavReview() {
+        const today = new Date().toISOString().split('T')[0];
+        dueCards = cards.filter(c => c.dueDate <= today);
+        if (dueCards.length === 0) { alert("Awesome! All English words are reviewed for today."); clickNav('dashboard-screen'); return; }
+        currentCardIndex = 0; clickNav('review-screen');
+    }
+    function gantiModeKuis(modeBaru) {
+        if (dueCards.length === 0 || currentCardIndex === -1) { alert("Please click 'Review Vocabulary' from the Dashboard first!"); return; }
+        modeKuisAktif = modeBaru; document.querySelectorAll('.quiz-tab').forEach(t => t.classList.remove('active'));
+        if(modeBaru === 'suara') document.getElementById('tab-mode-suara').classList.add('active');
+        if(modeBaru === 'hanzi') document.getElementById('tab-mode-hanzi').classList.add('active');
+        if(modeBaru === 'indo') document.getElementById('tab-mode-indo').classList.add('active');
+        showCard(); 
+    }
+    function saveCard() {
+        const front = document.getElementById('front-input').value.trim(); const pinyin = document.getElementById('pinyin-input').value.trim(); const back = document.getElementById('back-input').value.trim(); const editId = document.getElementById('edit-card-id').value; const today = new Date().toISOString().split('T')[0];
+        if (!front || !back) { alert('English word and Meaning fields cannot be empty!'); return; }
+        if (editId) { const idx = cards.findIndex(c => c.id == editId); if (idx !== -1) { cards[idx].front = front; cards[idx].pinyin = pinyin; cards[idx].back = back; } }
+        else { cards.push({ id: Date.now(), front: front, pinyin: pinyin, back: back, dueDate: today }); }
+        localStorage.setItem('english_anki_cards', JSON.stringify(cards)); clearForm();
+        if (editId) clickNavManage(); else clickNav('dashboard-screen');
+    }
+    
+    // RAPIH MENYAMPING HORIZONTAL (SYSTEM A)
+    function renderTable() {
+        const tbody = document.getElementById('cards-table-body'); tbody.innerHTML = '';
+        if (cards.length === 0) { tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:#94a3b8; padding:30px;">Empty collection.</td></tr>`; return; }
+        cards.forEach(card => {
+            const tr = document.createElement('tr'); const safeFront = card.front.replace(/'/g, "\\'");
+            tr.innerHTML = `
+                <td><b>${escapeHtml(card.front)}</b></td>
+                <td style="color:#64748b; font-style:italic;">${escapeHtml(card.pinyin)}</td>
+                <td>${escapeHtml(card.back)}</td>
+                <td>
+                    <div class="action-flex-container">
+                        <button class="btn-action btn-secondary" style="background-color:var(--sidebar-active);" onclick="putarAudioEnglish('${safeFront}')">🔊 Play</button>
+                        <button class="btn-action btn-secondary" style="background-color:#64748b;" onclick="editCard(${card.id})">Edit</button>
+                        <button class="btn-action btn-danger" onclick="deleteCard(${card.id})">Del</button>
+                    </div>
+                </td>`;
+            tbody.appendChild(tr);
+        });
+    }
+    function editCard(id) { const card = cards.find(c => c.id === id); if (card) { document.getElementById('front-input').value = card.front; document.getElementById('pinyin-input').value = card.pinyin; document.getElementById('back-input').value = card.back; document.getElementById('edit-card-id').value = card.id; clickNav('add-screen', 'Edit Word Info'); document.getElementById('btn-save').innerText = "Save Changes"; } }
+    function deleteCard(id) { if (confirm('Remove word?')) { cards = cards.filter(c => c.id !== id); localStorage.setItem('english_anki_cards', JSON.stringify(cards)); renderTable(); } }
+    function clearForm() { document.getElementById('front-input').value = ''; document.getElementById('pinyin-input').value = ''; document.getElementById('back-input').value = ''; document.getElementById('edit-card-id').value = ''; document.getElementById('btn-save').innerText = "Save Word"; }
+    function cancelAddEdit() { clearForm(); clickNav('dashboard-screen'); }
+    function showCard() {
+        if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+        if (modeKuisAktif === 'netral') return;
+        const card = dueCards[currentCardIndex]; const qaArea = document.getElementById('qa-area'); const safeFront = card.front.replace(/'/g, "\\'");
+        document.getElementById('btn-show').style.display = 'inline-block'; document.getElementById('rating-zone').style.display = 'none';
+        if (modeKuisAktif === 'suara') { qaArea.innerHTML = `<div class="card-meta-review">Listen and guess:</div><div class="icon-audio-quiz" onclick="putarAudioEnglish('${safeFront}')">🔊</div>`; putarAudioEnglish(card.front); }
+        else if (modeKuisAktif === 'hanzi') { qaArea.innerHTML = `<div class="card-meta-review">Guess Meaning:</div><div class="prompt-text-large" style="color:#2563eb;">${escapeHtml(card.front)}</div>`; }
+        else if (modeKuisAktif === 'indo') { qaArea.innerHTML = `<div class="card-meta-review">What is the English word for:</div><div class="prompt-text-large">${escapeHtml(card.back)}</div>`; }
+    }
+    function showAnswer() {
+        const card = dueCards[currentCardIndex]; const safeFront = card.front.replace(/'/g, "\\'");
+        document.getElementById('qa-area').innerHTML = `<div class="answer-list-container"><div class="answer-row"><div class="card-meta-review" style="color:#2563eb;">English Word / Sentence:</div><div class="english-text-list">${escapeHtml(card.front)}</div><button class="btn-audio-repeat" style="background-color:var(--sidebar-active);" onclick="putarAudioEnglish('${safeFront}')">🔊 Play</button></div><div class="answer-row"><div class="card-meta-review" style="color:#64748b;">Grammar / Notes:</div><div class="grammar-text-list">${card.pinyin ? escapeHtml(card.pinyin) : '-'}</div></div><div class="answer-row"><div class="card-meta-review" style="color:#16a34a;">Meaning (Indonesia):</div><div class="arti-text-list">${escapeHtml(card.back)}</div></div></div>`;
+        document.getElementById('btn-show').style.display = 'none'; document.getElementById('rating-zone').style.display = 'block';
+        if (modeKuisAktif !== 'suara') putarAudioEnglish(card.front);
+    }
+    function submitFeedback(daysToAdd) {
+        const currentCard = dueCards[currentCardIndex]; let targetDate = new Date(); targetDate.setDate(targetDate.getDate() + daysToAdd); const nextDueStr = targetDate.toISOString().split('T')[0];
+        const mainCard = cards.find(c => c.id === currentCard.id); if (mainCard) { mainCard.dueDate = nextDueStr; }
+        localStorage.setItem('english_anki_cards', JSON.stringify(cards)); currentCardIndex++;
+        if (currentCardIndex < dueCards.length) showCard(); else { alert('Vocabulary session finished!'); clickNav('dashboard-screen'); }
+    }
+
+    // ===============================================
+    // MODULE SYSTEM B: SPEAKING PROMPTS ONLY
+    // ===============================================
+    function clickNavSpeakingAdd() { clearSpeakingForm(); clickNav('speaking-add-screen'); }
+    function clickNavSpeakingManage() { clickNav('speaking-manage-screen'); renderSpeakingTable(); }
+    
+    function clickNavSpeakingReview() {
+        const today = new Date().toISOString().split('T')[0];
+        dueSpeakingCards = speakingCards.filter(c => c.dueDate <= today);
+        if (dueSpeakingCards.length === 0) { alert("Congratulations! All Speaking prompts have been practiced for today."); clickNav('dashboard-screen'); return; }
+        currentSpeakingIndex = 0; clickNav('speaking-review-screen'); showSpeakingCard();
+    }
+
+    function saveSpeakingCard() {
+        const front = document.getElementById('speaking-front-input').value.trim(); const editId = document.getElementById('edit-speaking-id').value; const today = new Date().toISOString().split('T')[0];
+        if (!front) { alert('Kolom Instruksi Skenario tidak boleh kosong!'); return; }
+        if (editId) { const idx = speakingCards.findIndex(c => c.id == editId); if (idx !== -1) { speakingCards[idx].front = front; } }
+        else { speakingCards.push({ id: Date.now(), front: front, dueDate: today }); }
+        localStorage.setItem('english_speaking_cards', JSON.stringify(speakingCards)); clearSpeakingForm();
+        if (editId) clickNavSpeakingManage(); else clickNav('dashboard-screen');
+    }
+
+    // RAPIH MENYAMPING HORIZONTAL (SYSTEM B)
+    function renderSpeakingTable() {
+        const tbody = document.getElementById('speaking-cards-table-body'); tbody.innerHTML = '';
+        if (speakingCards.length === 0) { tbody.innerHTML = `<tr><td colspan="2" style="text-align:center; color:#94a3b8; padding:30px;">Belum ada instruksi skenario speaking yang dibuat.</td></tr>`; return; }
+        speakingCards.forEach(card => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${escapeHtml(card.front)}</td>
+                <td>
+                    <div class="action-flex-container">
+                        <button class="btn-action btn-secondary" style="background-color:#64748b;" onclick="editSpeakingCard(${card.id})">Edit</button>
+                        <button class="btn-action btn-danger" onclick="deleteSpeakingCard(${card.id})">Del</button>
+                    </div>
+                </td>`;
+            tbody.appendChild(tr);
+        });
+    }
+
+    function editSpeakingCard(id) { const card = speakingCards.find(c => c.id === id); if (card) { document.getElementById('speaking-front-input').value = card.front; document.getElementById('edit-speaking-id').value = card.id; clickNav('speaking-add-screen', 'Edit Speaking Prompt'); document.getElementById('btn-speaking-save').innerText = "Save Changes"; } }
+    function deleteSpeakingCard(id) { if (confirm('Hapus kartu instruksi ini?')) { speakingCards = speakingCards.filter(c => c.id !== id); localStorage.setItem('english_speaking_cards', JSON.stringify(speakingCards)); renderSpeakingTable(); } }
+    function clearSpeakingForm() { document.getElementById('speaking-front-input').value = ''; document.getElementById('edit-speaking-id').value = ''; document.getElementById('btn-speaking-save').innerText = "Save Prompt Card"; }
+    function cancelSpeakingAddEdit() { clearSpeakingForm(); clickNav('dashboard-screen'); }
+    function showSpeakingCard() {
+        const card = dueSpeakingCards[currentSpeakingIndex]; const qaArea = document.getElementById('speaking-qa-area');
+        qaArea.innerHTML = `<div class="card-meta-review" style="color: #059669; font-weight:bold; letter-spacing:1px;">🗣️ SPEAKING CHALLENGE PROMPT</div><div class="prompt-text-large" style="font-size:24px; line-height:1.5; color:#0f172a; margin-top:20px;">${escapeHtml(card.front)}</div><p style="font-size:12px; color:#94a3b8; margin-top:20px; font-style:italic;">Pikirkan kalimatnya, lalu ucapkan keras-keras di dunia nyata sekarang!</p>`;
+        document.getElementById('btn-speaking-show').style.display = 'inline-block'; document.getElementById('speaking-rating-zone').style.display = 'none';
+    }
+    function showSpeakingAnswer() { document.getElementById('btn-speaking-show').style.display = 'none'; document.getElementById('speaking-rating-zone').style.display = 'block'; }
+    function submitSpeakingFeedback(daysToAdd) {
+        const currentCard = dueSpeakingCards[currentSpeakingIndex]; let targetDate = new Date(); targetDate.setDate(targetDate.getDate() + daysToAdd); const nextDueStr = targetDate.toISOString().split('T')[0];
+        const mainCard = speakingCards.find(c => c.id === currentCard.id); if (mainCard) { mainCard.dueDate = nextDueStr; }
+        localStorage.setItem('english_speaking_cards', JSON.stringify(speakingCards)); currentSpeakingIndex++;
+        if (currentSpeakingIndex < dueSpeakingCards.length) showSpeakingCard(); else { alert('Hebat! Sesi praktek instruksi speaking hari ini selesai.'); clickNav('dashboard-screen'); }
+    }
+
+    function escapeHtml(text) {
+        return text
+            .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+    }
+</script>
+</body>
+</html>
